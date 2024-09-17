@@ -1,0 +1,42 @@
+Question 1: By default are django signals executed synchronously or asynchronously? Please support your answer with a code snippet that conclusively proves your stance. The code does not need to be elegant and production ready, we just need to understand your logic.
+
+Django signals are executed synchronously by default.
+This means that when a signal is emitted, the code that triggered the signal will wait for all connected receivers to be executed before continuing.
+
+Here's a simple code snippet to demonstrate this:
+
+# models.py
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.db import models
+
+class MyModel(models.Model):
+    name = models.CharField(max_length=100)
+
+# Signal handler
+@receiver(post_save, sender=MyModel)
+def my_signal_handler(sender, instance, **kwargs):
+    print("Signal received! Processing...")
+    for i in range(3):
+        print(f"Processing step {i+1}")
+    
+# Usage example
+if __name__ == "__main__":
+    print("Before saving the object")
+    obj = MyModel(name="Test")
+    obj.save()  # This triggers the post_save signal
+    print("Object saved")
+
+Expected Output:
+Before saving the object
+Signal received! Processing...
+Processing step 1
+Processing step 2
+Processing step 3
+Object saved
+
+
+Explanation:
+- The 'obj.save()' triggers the 'post_save' signal.
+- The signal handler runs and prints each step in sequence.
+- Only after the signal handler finishes, the message "Object saved" is printed, showing synchronous execution.
