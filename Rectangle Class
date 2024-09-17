@@ -1,0 +1,22 @@
+class Rectangle:
+    def __init__(self, length, width):
+        self.length = length
+        self.width = width
+
+    def __iter__(self):
+        return iter([{'length': self.length}, {'width': self.width}])
+
+# Example usage:
+rect = Rectangle(5, 3)
+for item in rect:
+    print(item)
+
+Output:
+{'length': 5}
+{'width': 3}
+
+This code defines a Rectangle class with the specified requirements:
+
+1. Initialization: The __init__ method takes length and width as arguments and stores them as instance attributes.
+2. Iteration: The __iter__ method returns an iterator over a list containing two dictionaries: one for length and one for width. This allows the Rectangle instance to be iterated over, yielding the length and width in the desired format.
+3. Usage: The example code demonstrates how to create a Rectangle instance and iterate over it, printing the length and width in the specified format.
