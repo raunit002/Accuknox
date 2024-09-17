@@ -1,0 +1,36 @@
+Question 3: By default do django signals run in the same database transaction as the caller? Please support your answer with a code snippet that conclusively proves your stance. The code does not need to be elegant and production ready, we just need to understand your logic.
+
+By default, Django signals do run in the same database transaction as the caller. This means that any changes made within a signal receiver will be included in the same transaction as the code that triggered the signal.
+
+from django.db import models, transaction
+from django.dispatch import Signal
+
+my_signal = Signal()
+
+class MyModel(models.Model):
+    name = models.CharField(max_length=100)
+
+def receiver_function(sender, instance, **kwargs):
+    # Modify the instance within the same transaction
+    instance.name = "Modified"
+    instance.save()
+
+my_signal.connect(receiver_function)
+
+def my_view(request):
+    with transaction.atomic():
+        # Create a new instance
+        instance = MyModel.objects.create(name="Original")
+
+        # Send the signal
+        my_signal.send(sender=None, instance=instance)
+
+    # Check if the instance was modified
+    instance = MyModel.objects.get(pk=instance.pk)
+    print(instance.name)  # Output: "Modified"
+
+Output :
+Modified
+
+Explaination :
+The output "Modified" indicates that the MyModel instance was successfully updated within the same database transaction. This is because the signal receiver (receiver_function) is executed within the transaction.atomic() block, ensuring that any changes made within the receiver are included in the same transaction as the creation of the MyModel instance.
